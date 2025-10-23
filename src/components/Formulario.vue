@@ -1,5 +1,8 @@
 <template>
   <div class="row">
+    <div class="col-12 mb-4">
+      <progress-bar :porcentaje="porcentaje" />
+    </div>
     <div class="col-12 col-md-4">
       <form @submit.prevent="registrarProyeto">
         <div class="mb-3">
@@ -25,37 +28,17 @@
       </form>
     </div>
     <div class="col-12 col-md-8">
-        <h3>
-          Total Proyectos: {{ numeroProyectos }}
-        </h3>
-        <div class="table-responsive">
-          <table class="table table-dark table-hover">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Proyecto</th>
-                <th>Tipo</th>
-                <th>Urgente</th>
-                <th>Completado</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(proyecto, index) in proyectos" :key="index">
-                <td>{{ index + 1 }}</td>
-                <td>{{ proyecto.proyecto }}</td>
-                <td>{{ proyecto.tipo }}</td>
-                <td @click="cambiarEstado(proyecto, 'urgente')" :class="proyecto.urgente ? 'bg-success' : 'bg-danger'">{{ proyecto.urgente ? "SI" : "NO" }}</td>
-                <td @click="cambiarEstado(proyecto, 'completado')" :class="proyecto.completado ? 'bg-success' : 'bg-danger'">{{ proyecto.completado ? "Completo" : "Incompleto" }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <total-proyectos :numeroProyectos="numeroProyectos" :proyectos="proyectos" :cambiar-estado="cambiarEstado" />
     </div>
   </div>
 </template>
 
 <script>
+import ProgressBar from './ProgressBar.vue';
+import TotalProyectos from './TotalProyectos.vue';
+
 export default {
+  components: { ProgressBar, TotalProyectos },
   data: () => ({
     proyecto: "",
     tipo: "",
@@ -84,6 +67,16 @@ export default {
   computed: {
     numeroProyectos() {
       return this.proyectos.length;
+    },
+    porcentaje() {
+      let completados = 0;
+      
+      this.proyectos.map(proyecto => {
+        if (proyecto.completado)
+          completados++;
+      });
+      
+      return (completados * 100) / this.numeroProyectos || 0;
     }
   }
 }
